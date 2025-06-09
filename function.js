@@ -1,4 +1,3 @@
-
 const area = document.getElementById("Area");
 const ctx = area.getContext("2d");
 const radius = 10;
@@ -12,69 +11,124 @@ let points = [];
 let gameOver = false;
 let isPlayerTurn = false;
 let conn = null;
+let isConnected = false;  // 接続状態を管理
 
 area.width = 600;
 area.height = 600;
 
-const peer = new Peer();
+const peer = new Peer({
+	host: 'peerjs-server-n7gf.onrender.com',
+	port: 443,
+	path: '/myapp',
+	secure: true
+});
+
 peer.on('open', id => {
 	document.getElementById('my-id').innerText = id;
 });
 
 document.getElementById('connect-btn').addEventListener('click', () => {
-	const targetId = document.getElementById('peer-id-input').value;
+	if (conn && conn.open) {
+		alert('既に接続中です。');
+		return;
+	}
+	const targetId = document.getElementById('peer-id-input').value.trim();
+	if (!targetId) {
+		alert('相手のIDを入力してください');
+		return;
+	}
 	conn = peer.connect(targetId);
 	setupConnectionHandlers();
-	isPlayerTurn = true;
 });
 
 peer.on('connection', connection => {
+	if (conn && conn.open) {
+		// 既に接続済みなら新規接続拒否
+		connection.close();
+		return;
+	}
 	conn = connection;
 	setupConnectionHandlers();
-	isPlayerTurn = false;
 });
 
 function setupConnectionHandlers() {
 	conn.on('open', () => {
+		isConnected = true;
 
 		drawGrid();
 		getAllGridPoints();
 
-
+		// ここで先手を決める（ID文字列の大小比較で決める例）
+		isPlayerTurn = (peer.id < conn.peer);
 		updateTurnDisplay();
-		document.getElementById("boxs").style.display = 'none';
-		document.getElementById("my-id").style.display = 'none';
-		document.getElementById("peer-id-input").style.display = 'none';
-		document.getElementById("connect-btn").style.display = 'none';
-		document.getElementById('turnDisplay').style.display = 'block';
-		document.getElementById('Area').style.display = 'block';
+
+		toggleUIOnConnection();
 	});
 
 	conn.on('data', data => {
+		if (!validateReceivedData(data)) return;
+
 		if (data.type === 'place') {
 			handleReceivedMove(data.gridPoint);
 		} else if (data.type === 'gameOver') {
 			drawCircleOutline(data.circle);
 			gameOver = true;
+			showGameOverMessage("You Win! Game Over.");
 		} else if (data.type === 'reset') {
 			resetGame();
 		}
 	});
+
+	conn.on('error', err => {
+		alert('接続エラーが発生しました。再接続してください。');
+		console.error(err);
+	});
+
+	conn.on('close', () => {
+		isConnected = false;
+		alert('接続が切断されました。ページをリロードしてください。');
+	});
+}
+
+function toggleUIOnConnection() {
+	document.getElementById("boxs").style.display = 'none';
+	document.getElementById("my-id").style.display = 'none';
+	document.getElementById("peer-id-input").style.display = 'none';
+	document.getElementById("connect-btn").style.display = 'none';
+	document.getElementById('turnDisplay').style.display = 'block';
+	document.getElementById('Area').style.display = 'block';
+	rematchBtn.style.display = 'none';
+}
+
+function validateReceivedData(data) {
+	if (!data || typeof data.type !== 'string') return false;
+
+	if (data.type === 'place') {
+		if (!data.gridPoint || typeof data.gridPoint.x !== 'number' || typeof data.gridPoint.y !== 'number') {
+			console.warn('不正な座標データを受信しました。');
+			return false;
+		}
+	}
+	if (data.type === 'gameOver') {
+		if (!data.circle || typeof data.circle.cx !== 'number' || typeof data.circle.cy !== 'number' || typeof data.circle.r !== 'number') {
+			console.warn('不正なゲームオーバーデータを受信しました。');
+			return false;
+		}
+	}
+	return true;
 }
 
 function updateTurnDisplay() {
 	document.getElementById("turnDisplay").innerText = isPlayerTurn ? "あなたのターンです" : "相手のターンです";
 }
 
-
-
 area.addEventListener('click', (e) => {
 	if (gameOver || !isPlayerTurn || !conn?.open) return;
 
 	const rect = area.getBoundingClientRect();
 
-	const x = (e.clientX - rect.left) ;
-	const y = (e.clientY - rect.top)  ;
+	const x = (e.clientX - rect.left);
+	const y = (e.clientY - rect.top);
 
 	const gridPoint = getNearestGridPoint(x, y);
 
@@ -86,7 +140,6 @@ area.addEventListener('click', (e) => {
 	isPlayerTurn = false;
 	updateTurnDisplay();
 });
-
 
 function handleReceivedMove(gridPoint) {
 	placeDot(gridPoint);
@@ -111,11 +164,13 @@ function checkAfterMove(gridPoint, isLocal) {
 		drawCircleOutline(result.circle);
 		gameOver = true;
 		if (!isLocal) {
+			// 相手が勝った場合
 			showGameOverMessage("You Win! Game Over.");
-			conn.send({ type: 'gameOver', circle: result.circle });
 		} else {
+			// 自分が勝った場合は相手に通知し、リマッチボタンを表示
 			showGameOverMessage("You Lose! Game Over.");
 			rematchBtn.style.display = 'block';
+			conn.send({ type: 'gameOver', circle: result.circle });
 		}
 	}
 }
@@ -130,6 +185,7 @@ function getAllGridPoints() {
 }
 
 function drawGrid() {
+	ctx.clearRect(0, 0, area.width, area.height); // グリッド再描画前にクリア
 	ctx.strokeStyle = 'black';
 	ctx.lineWidth = 1;
 	for (let x = offset; x <= area.width; x += gridSize) {
@@ -224,5 +280,4 @@ rematchBtn.addEventListener('click', () => {
 	if (conn && conn.open) {
 		conn.send({ type: 'reset' });
 	}
-})
-
+});
