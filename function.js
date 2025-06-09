@@ -73,7 +73,6 @@ function setupConnectionHandlers() {
 		} else if (data.type === 'gameOver') {
 			drawCircleOutline(data.circle);
 			gameOver = true;
-			showGameOverMessage("You Win! Game Over.");
 		} else if (data.type === 'reset') {
 			resetGame();
 		}
