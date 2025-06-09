@@ -16,12 +16,7 @@ let conn = null;
 area.width = 600;
 area.height = 600;
 
-const peer = new Peer({
-  host: 'peerjs-server-psd1.onrender.com', // Renderのドメインだけ
-  port: 443,
-  path: '/',
-  secure: true
-});
+const peer = new Peer();
 peer.on('open', id => {
 	document.getElementById('my-id').innerText = id;
 });
