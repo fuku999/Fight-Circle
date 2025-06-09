@@ -16,12 +16,7 @@ let conn = null;
 area.width = 600;
 area.height = 600;
 
-const peer = new Peer({
-	host: 'peerjs-server-n7gf.onrender.com',
-	port: 443,
-	path: '/myapp',
-	secure: true
-});
+const peer = new Peer();
 peer.on('open', id => {
 	document.getElementById('my-id').innerText = id;
 });
