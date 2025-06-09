@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+	<meta charset="UTF-8">
+	<title>共円ゲーム（対戦）</title>
+	<link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+	<h2>PeerJS 共円ゲーム</h2>
+	<div>
+		<span id="boxs">あなたのID:</span> <span id="my-id">生成中...</span><br>
+		<input type="text" id="peer-id-input" placeholder="相手のIDを入力">
+		<button id="connect-btn">接続</button>
+	</div>
+	<p id="turnDisplay" style="display: none;"></p>
+	<canvas id="Area" style="display: none;"></canvas>
+	<p id="sgameOverMessage"></p>
+	<button id="reset" onclick="resetGame()" style="display: none;">再戦する</button>
+
+
+	<script src="https://unpkg.com/peerjs@1.4.7/dist/peerjs.min.js"></script>
+	<script src="function.js"></script>
+</body>
+
+</html>

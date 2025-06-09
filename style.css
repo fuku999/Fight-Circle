@@ -1,0 +1,87 @@
+@charset "UTF-8";
+
+body {
+	margin: 0;
+	padding: 0;
+	font-family: "Segoe UI", sans-serif;
+
+	background:
+		linear-gradient(135deg, #89f7fe 0%, #7dc8ff 50%, #66a6ff 100%);
+	background-blend-mode: overlay;
+
+	width: 100vw;
+	height: 100vh;
+
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: flex-start;
+
+	/* ズーム調整：好みに応じて */
+	transform: scale(0.67);
+	transform-origin: top left;
+
+	overflow: hidden;
+
+	will-change: transform;
+	backface-visibility: hidden;
+}
+
+#Area {
+	position: relative;
+	/* 子要素の絶対配置の基準にする */
+	width: 600px;
+	height: 600px;
+	background-color: #fff;
+	margin-top: 40px;
+	box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+	/* 影 */
+
+}
+
+button {
+	background-color: #66a6ff;
+	color: white;
+	border: none;
+	border-radius: 6px;
+	padding: 10px 20px;
+	font-size: 16px;
+	cursor: pointer;
+	box-shadow: 0 4px 8px rgba(102, 166, 255, 0.4);
+	transition: background-color 0.3s ease, box-shadow 0.3s ease;
+	margin-top: 20px;
+	
+}
+
+button:hover {
+	background-color: rgb(255, 128, 128);
+	box-shadow: 0 6px 12px rgb(255, 128, 128);
+}
+
+button:active {
+	background-color: #4a88ff;
+	box-shadow: 0 2px 4px rgba(74, 136, 255, 0.8);
+	transform: translateY(1px);
+}
+
+#reset {
+  position: fixed;   /* 画面に固定 */
+  right: -250px;       /* 右から20pxの位置 */
+  top: 70%;          /* 画面の縦中央 */
+  transform: translateY(-50%); /* ボタンの高さの半分だけ上にずらして縦中央に */
+  /* そのほかのスタイルはお好みで */
+  background-color: rgb(255, 128, 128);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 10px 20px;
+  font-size: 16px;
+  cursor: pointer;
+  box-shadow: 0 4px 8px rgb(255, 128, 128);
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+  z-index: 1000; /* 必要に応じて前面に */
+}
+#reset:hover {
+	background-color: rgb(255, 0, 0);
+	box-shadow: 0 6px 12px rgb(255, 0, 0);
+}
