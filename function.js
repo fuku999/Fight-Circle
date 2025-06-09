@@ -6,7 +6,7 @@ const gridSize = 50;
 const offset = 25;
 const epsilon = 5;
 const rematchBtn = document.getElementById('reset');
-const scale = 0.67;
+
 let emptyPoints = [];
 let points = [];
 let gameOver = false;
@@ -77,9 +77,9 @@ area.addEventListener('click', (e) => {
 	if (gameOver || !isPlayerTurn || !conn?.open) return;
 
 	const rect = area.getBoundingClientRect();
-	// scaleを考慮してクリック座標を補正
-	const x = (e.clientX - rect.left) / scale;
-	const y = (e.clientY - rect.top) / scale;
+
+	const x = (e.clientX - rect.left) ;
+	const y = (e.clientY - rect.top)  ;
 
 	const gridPoint = getNearestGridPoint(x, y);
 
