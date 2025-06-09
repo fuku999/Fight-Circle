@@ -17,13 +17,9 @@ body {
 	align-items: center;
 	justify-content: flex-start;
 
-	/* ズーム調整：好みに応じて */
-	transform: scale(0.67);
-	transform-origin: top left;
 
 	overflow: hidden;
 
-	will-change: transform;
 	backface-visibility: hidden;
 }
 
